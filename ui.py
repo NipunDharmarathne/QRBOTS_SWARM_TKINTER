@@ -26,35 +26,32 @@ def start():
     the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
 
 
-the_connection_1 = mavutil.mavlink_connection('udpout:192.168.123.50:14555')
-def arm():
-    the_connection_1.mav.system_time_send(1, 1)
-
-
 # scan stop buttons
 scan = Button(master, text = "SCAN", bg="springgreen3", command=scan)
-connect = Button(master, text = "CONNECT", bg="springgreen3")
 master.rowconfigure(2, minsize=35)
-scan.grid(row = 2, column=0)
-connect.grid(row = 2, column=1)
+scan.grid(row = 2, column=0, columnspan=2)
 
 # button widget
-b1 = Button(master, text = "ARM ALL", height=3, width=15, bg="springgreen3", command=arm)
-b2 = Button(master, text = "DISARM ALL", height=3, width=15, bg="cyan3")
+
+
 b3 = Button(master, text = "HOLD ALL", height=3, width=15, bg="olivedrab1")
 b4 = Button(master, text = "RTH ALL", height=3, width=15, bg="chocolate1")
 b5 = Button(master, text = "LAND ALL", height=3, width=15, bg="goldenrod1")
 b6 = Button(master, text = "SHUTDOWN ALL", height=3, width=15, bg="tomato")
 
 # arranging button widgets
-b1.grid(row = 3, column = 0, sticky = W)
-b2.grid(row = 3, column = 1, sticky = W)
+
+
 b3.grid(row = 4, column = 0, sticky = W)
 b4.grid(row = 4, column = 1, sticky = W)
 b5.grid(row = 5, column = 0, sticky = W)
 b6.grid(row = 5, column = 1, sticky = W)
 
 '''/// BACKEND ////////////////////////////////////////////////////////////////////////////////////////////////////'''
+
+source_ip_list = []
+connections = []
+
 
 def create_udp_socket():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -64,6 +61,7 @@ def create_udp_socket():
 def receive_data(source_ip_list):
     label_text = ""
     text.delete('1.0', 'end')
+    connections.clear()
 
     socket = create_udp_socket()
     start_time = time.time()
@@ -84,8 +82,28 @@ def receive_data(source_ip_list):
 
     l2.config(text=len(source_ip_list))
 
+    for source_ip in source_ip_list:
+        connection = mavutil.mavlink_connection('udpout:' + source_ip + ':14555')
+        connections.append(connection)
+    
+    print(connections)
 
-source_ip_list = []
+
+
+def armAll():
+    for connection in connections:
+        connection.mav.system_time_send(1, 1)
+
+def disarmAll():
+    for connection in connections:
+        connection.mav.param_request_list_send(1, 0)
+
+b1 = Button(master, text = "ARM ALL", height=3, width=15, bg="springgreen3", command=armAll)
+b1.grid(row = 3, column = 0, sticky = W)
+
+b2 = Button(master, text = "DISARM ALL", height=3, width=15, bg="cyan3", command=disarmAll)
+b2.grid(row = 3, column = 1, sticky = W)
+
 
 
 
