@@ -20,10 +20,8 @@ text.insert("1.0", label_text)
 
 # scan stop buttons
 scan = Button(master, text = "SCAN", bg="springgreen3")
-stop = Button(master, text = "STOP", bg="tomato")
 master.rowconfigure(2, minsize=35)
-scan.grid(row = 2, column=0, sticky = "E")
-stop.grid(row = 2, column=1, sticky = "W")
+scan.grid(row = 2, column=0, columnspan=2)
 
 # button widget
 b1 = Button(master, text = "ARM ALL", height=3, width=15, bg="springgreen3")
