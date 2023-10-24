@@ -1,5 +1,7 @@
 from tkinter import *
+from pymavlink import mavutil
 
+'''/// UI ////////////////////////////////////////////////////////////////////////////////////////////////////'''
 master = Tk()
 master.configure(bg="grey6")
 master.title("QRBOTS")
@@ -16,7 +18,7 @@ text.grid(row = 1, column=0, columnspan=2)
 label_text = "This is a long text that can be scrolled vertically in a Label widget in Tkinter.\n" * 10
 text.insert("1.0", label_text)
 
-
+# scan stop buttons
 scan = Button(master, text = "SCAN", bg="springgreen3")
 stop = Button(master, text = "STOP", bg="tomato")
 master.rowconfigure(2, minsize=35)
@@ -38,5 +40,19 @@ b3.grid(row = 4, column = 0, sticky = W)
 b4.grid(row = 4, column = 1, sticky = W)
 b5.grid(row = 5, column = 0, sticky = W)
 b6.grid(row = 5, column = 1, sticky = W)
+
+'''/// BACKEND ////////////////////////////////////////////////////////////////////////////////////////////////////'''
+
+# Start a connection listening on a UDP port
+the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
+the_connection_1 = mavutil.mavlink_connection('udpout:192.168.123.50:14555')
+the_connection_2 = mavutil.mavlink_connection('udpout:192.168.123.51:14555')
+
+def send_func1():
+    the_connection_1.mav.system_time_send(1, 1)
+
+def send_func2():
+    the_connection_2.mav.param_request_list_send(1, 0)
+
 
 mainloop()
