@@ -62,7 +62,8 @@ def receive_data(source_ip_list):
     label_text = ""
     text.delete('1.0', 'end')
     connections.clear()
-
+    source_ip_list.clear()
+    
     socket = create_udp_socket()
     start_time = time.time()
     while time.time() - start_time < 3:
