@@ -27,17 +27,7 @@ scan = Button(master, text = "SCAN", bg="springgreen3", command=scan)
 master.rowconfigure(2, minsize=35)
 scan.grid(row = 2, column=0, columnspan=2)
 
-# button widget
-b3 = Button(master, text = "LIGHT ALL", height=3, width=25, bg="olivedrab1")
-b4 = Button(master, text = "TAKE OFF ALL", height=3, width=25, bg="chocolate1")
-b5 = Button(master, text = "LAND ALL", height=3, width=25, bg="goldenrod1")
-b6 = Button(master, text = "RTL ALL", height=3, width=25, bg="tomato")
 
-# arranging button widgets
-b3.grid(row = 4, column = 0, sticky = W)
-b4.grid(row = 4, column = 1, sticky = W)
-b5.grid(row = 5, column = 0, sticky = W)
-b6.grid(row = 5, column = 1, sticky = W)
 
 '''/// BACKEND ////////////////////////////////////////////////////////////////////////////////////////////////////'''
 
@@ -78,19 +68,40 @@ def receive_data(source_ip_list):
 
 
 
-def armAll():
-    for connection in connections:
-        connection.mav.sys_status_send(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-
-
 def arm1():
     connections[1].mav.system_time_send(1, 1)
 
 
 
+def armAll():
+    for connection in connections:
+        connection.mav.sys_status_send(11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
 def disarmAll():
     for connection in connections:
-        connection.mav.param_request_list_send(1, 0)
+        connection.mav.sys_status_send(12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+def takeOffAll():
+    for connection in connections:
+        connection.mav.sys_status_send(13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+def landAll():
+    for connection in connections:
+        connection.mav.sys_status_send(14, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+def rtlAll():
+    for connection in connections:
+        connection.mav.sys_status_send(15, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+def showAll():
+    for connection in connections:
+        connection.mav.sys_status_send(16, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+def lightsAll():
+    for connection in connections:
+        connection.mav.sys_status_send(17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+
 
 b1 = Button(master, text = "ARM ALL", height=3, width=25, bg="springgreen3", command=armAll)
 b1.grid(row = 3, column = 0, sticky = W)
@@ -99,8 +110,19 @@ b2 = Button(master, text = "DISARM ALL", height=3, width=25, bg="cyan3", command
 b2.grid(row = 3, column = 1, sticky = W)
 
 
+b3 = Button(master, text = "TAKE OFF ALL", height=3, width=25, bg="chocolate1", command=takeOffAll)
+b4 = Button(master, text = "LAND ALL", height=3, width=25, bg="goldenrod1", command=landAll)
+b5 = Button(master, text = "RTL ALL", height=3, width=25, bg="tomato", command=rtlAll)
+b6 = Button(master, text = "SHOW ALL", height=3, width=25, bg="tomato", command=showAll)
+b7 = Button(master, text = "LIGHT ALL", height=3, width=25, bg="olivedrab1", command=lightsAll)
 
 
+# arranging button widgets
+b3.grid(row = 4, column = 0, sticky = W)
+b4.grid(row = 4, column = 1, sticky = W)
+b5.grid(row = 5, column = 0, sticky = W)
+b6.grid(row = 5, column = 1, sticky = W)
+b7.grid(row = 6, column = 0, sticky = W)
 
 
 
@@ -126,6 +148,7 @@ def create_labels_and_buttons(frame):
 
 
     for i in range(len(source_ip_list)):
+        print(f"IP address {i}: {source_ip_list[i]}")
         droneIP = Label(frame, text=source_ip_list[i])
         arm = Button(frame, text="ARM", bg="springgreen3", command=lambda ip=source_ip_list[i]: arm_button_command(ip))
         disarm = Button(frame, text="DISARM", bg="cyan3", command=lambda ip=source_ip_list[i]: disarm_button_command(ip))
