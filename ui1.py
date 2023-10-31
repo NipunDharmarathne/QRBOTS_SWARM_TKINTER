@@ -22,7 +22,7 @@ def start():
     the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
 
 
-# scan stop buttons
+# scan, stop buttons
 scan = Button(master, text = "SCAN", bg="springgreen3", command=scan)
 master.rowconfigure(2, minsize=35)
 scan.grid(row = 2, column=0, columnspan=2)
@@ -30,7 +30,6 @@ scan.grid(row = 2, column=0, columnspan=2)
 
 
 '''/// BACKEND ////////////////////////////////////////////////////////////////////////////////////////////////////'''
-
 source_ip_list = []
 connections = []
 
@@ -52,10 +51,10 @@ def receive_data(source_ip_list):
             if time.time() - start_time >= 3:
                 break  # Exit the loop after 3 seconds
             try:
-                data, addr = udp_socket.recvfrom(1024)  # Adjust buffer size as needed
+                data, addr = udp_socket.recvfrom(1024)
                 if addr[0] not in source_ip_list:
                     source_ip_list.append(addr[0])
-                print(f"Received packet from {addr[0]}:{addr[1]}")
+                # print(f"Received packet from {addr[0]}:{addr[1]}")
             except socket.timeout:
                 print("No packet received within the timeout.")
     except KeyboardInterrupt:
@@ -77,11 +76,9 @@ def receive_data(source_ip_list):
     print(connections)
 
 
-
+'''/// BUTTON COMMANDS //////////////////////////////////////////////'''
 def arm1():
     connections[1].mav.system_time_send(1, 1)
-
-
 
 def armAll():
     for connection in connections:
