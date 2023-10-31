@@ -35,23 +35,33 @@ source_ip_list = []
 connections = []
 
 def create_udp_socket():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_socket.bind(('0.0.0.0', 14550))
-    return server_socket
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udp_socket.bind(('0.0.0.0', 14550))
+    udp_socket.settimeout(3.0)
+    return udp_socket
 
 def receive_data(source_ip_list):
     connections.clear()
     source_ip_list.clear()
     
-    socket = create_udp_socket()
-    start_time = time.time()
-    while time.time() - start_time < 3:
-        data, addr = socket.recvfrom(1024)
-
-        if addr[0] not in source_ip_list:
-            source_ip_list.append(addr[0])
-
-    socket.close()
+    udp_socket = create_udp_socket()
+    
+    try:
+        start_time = time.time()
+        while True:
+            if time.time() - start_time >= 3:
+                break  # Exit the loop after 3 seconds
+            try:
+                data, addr = udp_socket.recvfrom(1024)  # Adjust buffer size as needed
+                if addr[0] not in source_ip_list:
+                    source_ip_list.append(addr[0])
+                print(f"Received packet from {addr[0]}:{addr[1]}")
+            except socket.timeout:
+                print("No packet received within the timeout.")
+    except KeyboardInterrupt:
+        print("Listening stopped.")
+    finally:
+        udp_socket.close()
     
     source_ip_list = sorted(source_ip_list, key=lambda x: (int(x.split('.')[-1]), x))
     print("ESP IP Addresses:")
