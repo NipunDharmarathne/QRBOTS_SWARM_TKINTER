@@ -16,7 +16,7 @@ numDrones.grid(row = 0, column = 1, sticky = W)
 
 
 def scan():
-    receive_data(source_ip_list)
+    receive_data(esp32_ip_list)
 
 def start():
     the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
@@ -30,8 +30,8 @@ scan.grid(row = 2, column=0, columnspan=2)
 
 
 '''/// BACKEND ////////////////////////////////////////////////////////////////////////////////////////////////////'''
-source_ip_list = []
-connections = []
+esp32_ip_list = []
+udpout_connection_list = []
 
 def create_udp_socket():
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -39,10 +39,10 @@ def create_udp_socket():
     udp_socket.settimeout(3.0)
     return udp_socket
 
-def receive_data(source_ip_list):
-    connections.clear()
-    source_ip_list.clear()
-    
+def receive_data(esp32_ip_list):
+    esp32_ip_list.clear()
+    udpout_connection_list.clear()
+
     udp_socket = create_udp_socket()
     
     try:
@@ -52,8 +52,8 @@ def receive_data(source_ip_list):
                 break  # Exit the loop after 3 seconds
             try:
                 data, addr = udp_socket.recvfrom(1024)
-                if addr[0] not in source_ip_list:
-                    source_ip_list.append(addr[0])
+                if addr[0] not in esp32_ip_list:
+                    esp32_ip_list.append(addr[0])
                 # print(f"Received packet from {addr[0]}:{addr[1]}")
             except socket.timeout:
                 print("No packet received within the timeout.")
@@ -62,50 +62,49 @@ def receive_data(source_ip_list):
     finally:
         udp_socket.close()
     
-    source_ip_list = sorted(source_ip_list, key=lambda x: (int(x.split('.')[-1]), x))
-    print("ESP IP Addresses:")
-    print(source_ip_list)
+    esp32_ip_list = sorted(esp32_ip_list, key=lambda x: (int(x.split('.')[-1]), x))
+    print("ESP32 IPs:", esp32_ip_list)
 
-    numDrones.config(text=len(source_ip_list))
+    numDrones.config(text=len(esp32_ip_list))
 
-    for source_ip in source_ip_list:
+    for source_ip in esp32_ip_list:
         connection = mavutil.mavlink_connection('udpout:' + source_ip + ':14555')
-        connections.append(connection)
+        udpout_connection_list.append(connection)
     
     create_labels_and_buttons(frame_inner)
-    print(connections)
+    print("UDPOUT Connections:", udpout_connection_list)
 
 
 '''/// BUTTON COMMANDS //////////////////////////////////////////////'''
 def arm1():
-    connections[1].mav.system_time_send(1, 1)
+    udpout_connection_list[1].mav.system_time_send(1, 1)
 
 def armAll():
-    for connection in connections:
+    for connection in udpout_connection_list:
         connection.mav.sys_status_send(11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 def disarmAll():
-    for connection in connections:
+    for connection in udpout_connection_list:
         connection.mav.sys_status_send(12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 def takeOffAll():
-    for connection in connections:
+    for connection in udpout_connection_list:
         connection.mav.sys_status_send(13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 def landAll():
-    for connection in connections:
+    for connection in udpout_connection_list:
         connection.mav.sys_status_send(14, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 def rtlAll():
-    for connection in connections:
+    for connection in udpout_connection_list:
         connection.mav.sys_status_send(15, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 def showAll():
-    for connection in connections:
+    for connection in udpout_connection_list:
         connection.mav.sys_status_send(16, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 def lightsAll():
-    for connection in connections:
+    for connection in udpout_connection_list:
         connection.mav.sys_status_send(17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 
@@ -154,13 +153,13 @@ def create_labels_and_buttons(frame):
         print(f"TAKE OFF button clicked for {ip}")
 
 
-    for i in range(len(source_ip_list)):
-        print(f"IP address {i}: {source_ip_list[i]}")
-        droneIP = Label(frame, text=source_ip_list[i])
-        arm = Button(frame, text="ARM", bg="springgreen3", command=lambda ip=source_ip_list[i]: arm_button_command(ip))
-        disarm = Button(frame, text="DISARM", bg="cyan3", command=lambda ip=source_ip_list[i]: disarm_button_command(ip))
-        light = Button(frame, text="LIGHT", bg="olivedrab1", command=lambda ip=source_ip_list[i]: light_button_command(ip))
-        takeOff = Button(frame, text="TAKE OFF", bg="chocolate1", command=lambda ip=source_ip_list[i]: takeoff_button_command(ip))
+    for i in range(len(esp32_ip_list)):
+        # print(f"IP address {i}: {esp32_ip_list[i]}")
+        droneIP = Label(frame, text=esp32_ip_list[i])
+        arm = Button(frame, text="ARM", bg="springgreen3", command=lambda ip=esp32_ip_list[i]: arm_button_command(ip))
+        disarm = Button(frame, text="DISARM", bg="cyan3", command=lambda ip=esp32_ip_list[i]: disarm_button_command(ip))
+        light = Button(frame, text="LIGHT", bg="olivedrab1", command=lambda ip=esp32_ip_list[i]: light_button_command(ip))
+        takeOff = Button(frame, text="TAKE OFF", bg="chocolate1", command=lambda ip=esp32_ip_list[i]: takeoff_button_command(ip))
 
 
         droneIP.grid(row=i, column=0, padx=1, pady=1, sticky="w")
