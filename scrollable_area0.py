@@ -11,12 +11,11 @@ root = tk.Tk()
 root.title("Scrollable Area")
 
 # Set the fixed width and height for the canvas
-canvas = tk.Canvas(root, width=400, height=200)
+canvas = tk.Canvas(root, width=400, height=100)
 scrollbar = tk.Scrollbar(root, orient="vertical", command=canvas.yview)
 canvas.config(yscrollcommand=scrollbar.set)
 
-# Set the fixed width for the frame and disable resizing
-frame = tk.Frame(canvas, width=400)
+frame = tk.Frame(canvas)
 frame.pack_propagate(0)
 canvas.create_window((0, 0), window=frame, anchor="nw")
 create_labels_and_buttons(frame)

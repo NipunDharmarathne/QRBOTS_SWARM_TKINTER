@@ -40,18 +40,42 @@ welcome_message(frame_inner)
 frame_inner.update_idletasks()
 canvas.config(scrollregion=canvas.bbox("all"))
 
-# scan, stop buttons #################################################################
+# scan button ##################################################################
 def scan():
     receive_data(esp32_ip_list)
-
-def start():
-    the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
 
 scan = Button(master, text = "SCAN", bg="springgreen3", command=scan)
 master.rowconfigure(2, minsize=35)
 scan.grid(row = 2, column=0, columnspan=2)
 
+# Listen messages ############################################################
+frame1 = Frame(master)
+frame1.grid(row=3, column=0, columnspan=2, sticky="nsew")
 
+# Specify the width and height for the canvas
+canvas1 = Canvas(frame1, width=300, height=200)
+canvas1.grid(row=0, column=0, sticky="nsew")
+scrollbar1 = Scrollbar(frame1, orient="vertical", command=canvas1.yview)
+scrollbar1.grid(row=0, column=1, sticky="ns")
+
+frame1.grid_rowconfigure(0, weight=1)
+frame1.grid_columnconfigure(0, weight=1)
+
+canvas1.config(yscrollcommand=scrollbar1.set)
+
+frame1_inner = Frame(canvas1)
+canvas1.create_window((0, 0), window=frame1_inner, anchor="nw")
+
+frame1_inner.update_idletasks()
+canvas1.config(scrollregion=canvas1.bbox("all"))
+
+# start button ##################################################################
+def start():
+    the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
+
+start = Button(master, text = "START", bg="springgreen3", command=start)
+master.rowconfigure(4, minsize=35)
+start.grid(row = 4, column=0, columnspan=2)
 
 '''/// BACKEND ////////////////////////////////////////////////////////////////////////////////////////////////////'''
 esp32_ip_list = []
@@ -134,10 +158,10 @@ def lightsAll():
 
 
 b1 = Button(master, text = "ARM ALL", height=3, width=25, bg="springgreen3", command=armAll)
-b1.grid(row = 3, column = 0, sticky = W)
+b1.grid(row = 5, column = 0, sticky = W)
 
 b2 = Button(master, text = "DISARM ALL", height=3, width=25, bg="cyan3", command=disarmAll)
-b2.grid(row = 3, column = 1, sticky = W)
+b2.grid(row = 5, column = 1, sticky = W)
 
 
 b3 = Button(master, text = "TAKE OFF ALL", height=3, width=25, bg="chocolate1", command=takeOffAll)
@@ -148,11 +172,11 @@ b7 = Button(master, text = "LIGHT ALL", height=3, width=25, bg="olivedrab1", com
 
 
 # arranging button widgets
-b3.grid(row = 4, column = 0, sticky = W)
-b4.grid(row = 4, column = 1, sticky = W)
-b5.grid(row = 5, column = 0, sticky = W)
-b6.grid(row = 5, column = 1, sticky = W)
-b7.grid(row = 6, column = 0, sticky = W)
+b3.grid(row = 6, column = 0, sticky = W)
+b4.grid(row = 6, column = 1, sticky = W)
+b5.grid(row = 7, column = 0, sticky = W)
+b6.grid(row = 7, column = 1, sticky = W)
+b7.grid(row = 8, column = 0, sticky = W)
 
 
 
@@ -197,12 +221,6 @@ def create_labels_and_buttons(frame):
     else:
         errMsg = Label(frame, text="Unable to establish a connection.")
         errMsg.grid(row=0, column=0, padx=1, pady=1, sticky="w")
-
-    # for i in range(5):
-    #     label = Label(frame, text=f"Label {i}")
-    #     button = Button(frame, text=f"Button {i}")
-    #     label.grid(row=i, column=0, padx=10, pady=5, sticky="w")
-    #     button.grid(row=i, column=1, padx=10, pady=5, sticky="e")
 
     frame_inner.update_idletasks()
     canvas.config(scrollregion=canvas.bbox("all"))
