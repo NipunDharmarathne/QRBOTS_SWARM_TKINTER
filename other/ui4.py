@@ -73,7 +73,7 @@ canvas1.config(scrollregion=canvas1.bbox("all"))
 # start button ##################################################################
 def start():
     create_labels(frame1_inner)
-    define_func()
+    # define_func()
     listen_func()
 
 start = Button(master, text = "START", bg="springgreen3", command=start)
@@ -258,30 +258,32 @@ def create_labels(frame):
     canvas1.config(scrollregion=canvas1.bbox("all"))
 
 
-the_connection = None  # Define the global variable
-def define_func():
-    global the_connection  # Declare the global variable
-    the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
+# the_connection = None  # Define the global variable
+# def define_func():
+#     global the_connection  # Declare the global variable
+#     the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
 
 def listen_func():
-    global the_connection
-    msg = the_connection.recv_match(type='ATTITUDE', blocking=True)
-    if msg is not None:    
-        if msg.get_srcSystem()==1 and msg.get_srcComponent()==1:    
-            print(f"sysid: {msg.get_srcSystem()}, compid: {msg.get_srcComponent()}, message id: {msg.get_msgId()}")
-            yawVals[0].config(text=f"{msg.yaw*180/math.pi:.2f}")
-            # roll_1.config(text=f"Roll: {msg.roll:.2f}")
-            # pitch_1.config(text=f"Pitch: {msg.pitch:.2f}")
-            # yaw_1.config(text=f"Yaw: {msg.yaw:.2f}")
-            master.after(400, listen_func)  
+    # global the_connection
+    the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
 
-        elif msg.get_srcSystem()==2 and msg.get_srcComponent()==1:
-            print(f"sysid: {msg.get_srcSystem()}, compid: {msg.get_srcComponent()}, message id: {msg.get_msgId()}")
-            # roll_2.config(text=f"Roll: {msg.roll:.2f}")
-            # pitch_2.config(text=f"Pitch: {msg.pitch:.2f}")
-            # yaw_2.config(text=f"Yaw: {msg.yaw:.2f}")
-            master.after(400, listen_func) 
+    while True:
+        msg = the_connection.recv_match(type='ATTITUDE', blocking=True)
+        if msg is not None:    
+            if msg.get_srcSystem()==1 and msg.get_srcComponent()==1:    
+                print(f"sysid: {msg.get_srcSystem()}, compid: {msg.get_srcComponent()}, message id: {msg.get_msgId()}")
+                yawVals[0].config(text=f"{msg.yaw*180/math.pi:.2f}")
+                # roll_1.config(text=f"Roll: {msg.roll:.2f}")
+                # pitch_1.config(text=f"Pitch: {msg.pitch:.2f}")
+                # yaw_1.config(text=f"Yaw: {msg.yaw:.2f}") 
 
+            elif msg.get_srcSystem()==2 and msg.get_srcComponent()==1:
+                print(f"sysid: {msg.get_srcSystem()}, compid: {msg.get_srcComponent()}, message id: {msg.get_msgId()}")
+                # roll_2.config(text=f"Roll: {msg.roll:.2f}")
+                # pitch_2.config(text=f"Pitch: {msg.pitch:.2f}")
+                # yaw_2.config(text=f"Yaw: {msg.yaw:.2f}")
+
+        master.update()
 '''////////////////////////////////////////'''
 
 mainloop()
