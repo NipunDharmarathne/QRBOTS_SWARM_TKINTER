@@ -44,7 +44,7 @@ canvas.config(scrollregion=canvas.bbox("all"))
 
 # scan button ##################################################################
 def scan():
-    receive_data(esp32_ip_list)
+    receive_data()
 
 scan = Button(master, text = "SCAN", bg="springgreen3", command=scan)
 master.rowconfigure(2, minsize=35)
@@ -91,7 +91,8 @@ def create_udp_socket():
     udp_socket.settimeout(3.0)
     return udp_socket
 
-def receive_data(esp32_ip_list):
+def receive_data():
+    global esp32_ip_list
     esp32_ip_list.clear()
     udpout_connection_list.clear()
 
@@ -127,6 +128,10 @@ def receive_data(esp32_ip_list):
     print("UDPOUT Connections:", udpout_connection_list)
 
 '''/// BUTTON COMMANDS //////////////////////////////////////////////'''
+
+print("ESP32 IPs:", esp32_ip_list)
+
+
 def arm0():
     udpout_connection_list[0].mav.sys_status_send(11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
