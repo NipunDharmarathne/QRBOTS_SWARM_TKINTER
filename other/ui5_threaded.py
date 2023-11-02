@@ -128,13 +128,6 @@ def receive_data():
     print("UDPOUT Connections:", udpout_connection_list)
 
 '''/// BUTTON COMMANDS //////////////////////////////////////////////'''
-
-print("ESP32 IPs:", esp32_ip_list)
-
-
-def arm0():
-    udpout_connection_list[0].mav.sys_status_send(11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-
 def armAll():
     for connection in udpout_connection_list:
         connection.mav.sys_status_send(11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
@@ -196,9 +189,9 @@ def create_labels_and_buttons(frame):
         widget.destroy()
         
     def arm_button_command(ip):
-        # Add the action you want to perform when the ARM button is clicked for the given IP
         print(f"ARM button clicked for {ip}")
-        arm0()
+        index = esp32_ip_list.index(ip)
+        udpout_connection_list[index].mav.sys_status_send(11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
     def disarm_button_command(ip):
         # Add the action you want to perform when the DISARM button is clicked for the given IP
