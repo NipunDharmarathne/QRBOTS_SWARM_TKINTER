@@ -74,7 +74,6 @@ canvas1.config(scrollregion=canvas1.bbox("all"))
 # start button ##################################################################
 def start():
     create_labels(frame1_inner)
-    # define_func()
     start_receive_thread()
 
 start = Button(master, text = "START", bg="springgreen3", command=start)
@@ -161,16 +160,14 @@ def lightsAll():
 b1 = Button(master, text = "ARM ALL", height=3, width=25, bg="springgreen3", command=armAll)
 b1.grid(row = 5, column = 0, sticky = W)
 
-b2 = Button(master, text = "DISARM ALL", height=3, width=25, bg="cyan3", command=disarmAll)
+b2 = Button(master, text = "DISARM ALL", height=3, width=25, bg="cyan4", command=disarmAll)
 b2.grid(row = 5, column = 1, sticky = W)
 
-
-b3 = Button(master, text = "TAKE OFF ALL", height=3, width=25, bg="chocolate1", command=takeOffAll)
-b4 = Button(master, text = "LAND ALL", height=3, width=25, bg="goldenrod1", command=landAll)
-b5 = Button(master, text = "RTL ALL", height=3, width=25, bg="tomato", command=rtlAll)
+b3 = Button(master, text = "TAKE OFF ALL", height=3, width=25, bg="chartreuse2", command=takeOffAll)
+b4 = Button(master, text = "LAND ALL", height=3, width=25, bg="chocolate1", command=landAll)
+b5 = Button(master, text = "RTL ALL", height=3, width=25, bg="goldenrod1", command=rtlAll)
 b6 = Button(master, text = "SHOW ALL", height=3, width=25, bg="tomato", command=showAll)
 b7 = Button(master, text = "LIGHT ALL", height=3, width=25, bg="olivedrab1", command=lightsAll)
-
 
 # arranging button widgets
 b3.grid(row = 6, column = 0, sticky = W)
@@ -227,6 +224,7 @@ def create_labels_and_buttons(frame):
     canvas.config(scrollregion=canvas.bbox("all"))
 
 ''''///////////////////////////'''
+
 yawVals = []
 
 def create_labels(frame):
@@ -256,14 +254,7 @@ def create_labels(frame):
     frame1_inner.update_idletasks()
     canvas1.config(scrollregion=canvas1.bbox("all"))
 
-
-# the_connection = None  # Define the global variable
-# def define_func():
-#     global the_connection  # Declare the global variable
-#     the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
-
 def listen_func():
-    # global the_connection
     the_connection = mavutil.mavlink_connection('udp:0.0.0.0:14550')
 
     while True:
