@@ -1,6 +1,7 @@
 import tkinter
 import os
 from tkintermapview import TkinterMapView
+from PIL import Image, ImageTk
 
 # create tkinter window
 root_tk = tkinter.Tk()
@@ -19,6 +20,8 @@ map_widget.pack(fill="both", expand=True)
 map_widget.set_position(7.25963, 80.59915)
 map_widget.set_zoom(19)
 
-marker_3 = map_widget.set_marker(7.25974, 80.59904, text="52.55, 13.4")
+current_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+location_image = ImageTk.PhotoImage(Image.open(os.path.join(current_path, "images", "location.png")).resize((10, 15)))
+marker_1 = map_widget.set_marker(7.25974, 80.59904, text="52.55, 13.4", icon=location_image)
 
 root_tk.mainloop()
