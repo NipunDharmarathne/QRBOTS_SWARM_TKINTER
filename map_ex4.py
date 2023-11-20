@@ -61,13 +61,17 @@ def add_marker_event(coords):
     lat2_1, lon2_1 = get_point_at_distance(lat1_1, lon1_1, distance, bearing)
     lat3_1, lon3_1 = get_point_at_distance(lat2_1, lon2_1, distance, bearing)
 
-    new_marker1_1 = map_widget.set_marker(lat1_1, lon1_1, text="1", icon=location_image)
-    new_marker2_1 = map_widget.set_marker(lat2_1, lon2_1, text="2", icon=location_image)
-    new_marker3_1 = map_widget.set_marker(lat3_1, lon3_1, text="3", icon=location_image)
+    new_marker1_1 = map_widget.set_marker(lat1_1, lon1_1, icon=location_image)
+    new_marker2_1 = map_widget.set_marker(lat2_1, lon2_1, icon=location_image)
+    new_marker3_1 = map_widget.set_marker(lat3_1, lon3_1,icon=location_image)
 
     lat1_2, lon1_2 = get_point_at_distance(lat1_1, lon1_1, distance, 0)
+    lat2_2, lon2_2 = get_point_at_distance(lat1_2, lon1_2, distance, 90)
+    lat3_2, lon3_2 = get_point_at_distance(lat2_2, lon2_2, distance, 90)
 
-    new_marker1_2 = map_widget.set_marker(lat1_2, lon1_2, text="4", icon=location_image)
+    new_marker1_2 = map_widget.set_marker(lat1_2, lon1_2, icon=location_image)
+    new_marker2_2 = map_widget.set_marker(lat2_2, lon2_2, icon=location_image)
+    new_marker3_2 = map_widget.set_marker(lat3_2, lon3_2, icon=location_image)
 
 
 map_widget.add_right_click_menu_command(label="Add Marker",
