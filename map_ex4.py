@@ -54,7 +54,7 @@ def add_marker_event(coords):
     print("Add marker:", coords)
     
     distance = 0.005
-    bearing = 90
+    bearing = 90 + 45
         
     lat1_1 = coords[0]
     lon1_1 = coords[1]
@@ -65,9 +65,9 @@ def add_marker_event(coords):
     new_marker2_1 = map_widget.set_marker(lat2_1, lon2_1, icon=location_image)
     new_marker3_1 = map_widget.set_marker(lat3_1, lon3_1,icon=location_image)
 
-    lat1_2, lon1_2 = get_point_at_distance(lat1_1, lon1_1, distance, 0)
-    lat2_2, lon2_2 = get_point_at_distance(lat1_2, lon1_2, distance, 90)
-    lat3_2, lon3_2 = get_point_at_distance(lat2_2, lon2_2, distance, 90)
+    lat1_2, lon1_2 = get_point_at_distance(lat1_1, lon1_1, distance, 45)
+    lat2_2, lon2_2 = get_point_at_distance(lat1_2, lon1_2, distance, bearing)
+    lat3_2, lon3_2 = get_point_at_distance(lat2_2, lon2_2, distance, bearing)
 
     new_marker1_2 = map_widget.set_marker(lat1_2, lon1_2, icon=location_image)
     new_marker2_2 = map_widget.set_marker(lat2_2, lon2_2, icon=location_image)
