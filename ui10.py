@@ -54,9 +54,7 @@ map_widget.set_zoom(19)
 
 current_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 location_image = ImageTk.PhotoImage(Image.open(os.path.join(current_path, "images", "location.png")).resize((5, 8)))
-marker_1 = map_widget.set_marker(7.25974, 80.59904, text="52.55, 13.4", icon=location_image)
 
-showOrientationVal = 0
 
 def add_marker_event(coords, showOrientationVal):
     print("Add marker:", coords)
@@ -88,15 +86,6 @@ def add_marker_event(coords, showOrientationVal):
     new_marker3_2 = map_widget.set_marker(lat3_2, lon3_2, icon=location_image)
     new_marker4_2 = map_widget.set_marker(lat4_2, lon4_2, icon=location_image)
     new_marker5_2 = map_widget.set_marker(lat5_2, lon5_2, icon=location_image)
-
-map_widget.add_right_click_menu_command(label="Add Marker",
-                                        command=add_marker_event,
-                                        pass_coords=True)
-
-def left_click_event(coordinates_tuple):
-    map_widget.delete_all_marker()
-    
-map_widget.add_left_click_map_command(left_click_event)
 
 
 
@@ -248,36 +237,49 @@ def lightsAll():
         connection.mav.sys_status_send(17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 def getShowOrientation():
-    content = showOrientation.get("1.0", "end-1c")
-    float_content = float(content)
-    showOrientationVal = float_content
+    contentShowOrientation = showOrientation.get("1.0", "end-1c")
+    float_contentShowOrientation = float(contentShowOrientation)
+    showOrientationVal = float_contentShowOrientation
     print(showOrientationVal)
-    map_widget.delete_all_marker()
-    add_marker_event([7.2597763, 80.5990883], showOrientationVal)
 
+    contentShowOrigin = showOrigin.get("1.0", "end-1c")
+    float_contentShowOrientation = float(contentShowOrientation)
+    showOrientationVal = float_contentShowOrientation
+    print(showOrientationVal)
+
+    lat1_1_str, lon1_1_str = contentShowOrigin.split()
+    lat1_1 = float(lat1_1_str)
+    lon1_1 = float(lon1_1_str)
+    print("Latitude:", lat1_1)
+    print("Longitude:", lon1_1)
+
+    map_widget.delete_all_marker()
+    add_marker_event([lat1_1, lon1_1], showOrientationVal)
+
+
+showOriginLabel = Label(master, text = "    Show Origin:", fg="white", bg="grey6")
+showOriginLabel.grid(row = 5, column = 0, sticky = W)
 
 showOrigin = Text(master, height=1, width=22)
-showOrigin.grid(row = 5, column = 0)
+showOrigin.insert("1.0", "7.2597843 80.5991768")
+showOrigin.grid(row = 5, column = 1)
 
-updateShowOrigin = Button(master, text = "Update Show Origin", height=1, width=25, bg="springgreen3", command=armAll)
-updateShowOrigin.grid(row = 5, column = 1, sticky = W)
+showOrientationLabel = Label(master, text = "    Show Orientation:", fg="white", bg="grey6")
+showOrientationLabel.grid(row = 6, column = 0, sticky = W)
 
 showOrientation = Text(master, height=1, width=22)
 showOrientation.insert("1.0", "0.0")
-showOrientation.grid(row = 6, column = 0, sticky = N)
+showOrientation.grid(row = 6, column = 1, sticky = N)
 
-updateShowOrientation = Button(master, text = "Update Show Orientation", height=1, width=25, bg="cyan4", command=getShowOrientation)
-updateShowOrientation.grid(row = 6, column = 1, sticky = NW)
-
-
-
+updateShowOriginOrientation = Button(master, text = "UPDATE", bg="cyan4", command=getShowOrientation)
+updateShowOriginOrientation.grid(row = 7, column = 0, columnspan=2, sticky = N)
 
 
 b1 = Button(master, text = "ARM ALL", height=3, width=25, bg="springgreen3", command=armAll)
-b1.grid(row = 7, column = 0, sticky = W)
+b1.grid(row = 8, column = 0, sticky = W)
 
 b2 = Button(master, text = "DISARM ALL", height=3, width=25, bg="cyan4", command=disarmAll)
-b2.grid(row = 7, column = 1, sticky = W)
+b2.grid(row = 8, column = 1, sticky = W)
 
 b3 = Button(master, text = "TAKE OFF ALL", height=3, width=25, bg="chartreuse2", command=takeOffAll)
 b4 = Button(master, text = "LAND ALL", height=3, width=25, bg="chocolate1", command=landAll)
@@ -286,11 +288,11 @@ b6 = Button(master, text = "SHOW ALL", height=3, width=25, bg="tomato", command=
 b7 = Button(master, text = "LIGHT ALL", height=3, width=25, bg="olivedrab1", command=lightsAll)
 
 # arranging button widgets
-b3.grid(row = 8, column = 0, sticky = W)
-b4.grid(row = 8, column = 1, sticky = W)
-b5.grid(row = 9, column = 0, sticky = W)
-b6.grid(row = 9, column = 1, sticky = W)
-b7.grid(row = 10, column = 0, sticky = W)
+b3.grid(row = 9, column = 0, sticky = W)
+b4.grid(row = 9, column = 1, sticky = W)
+b5.grid(row = 10, column = 0, sticky = W)
+b6.grid(row = 10, column = 1, sticky = W)
+b7.grid(row = 11, column = 0, sticky = W)
 
 
 

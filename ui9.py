@@ -89,9 +89,6 @@ def add_marker_event(coords, showOrientationVal):
     new_marker4_2 = map_widget.set_marker(lat4_2, lon4_2, icon=location_image)
     new_marker5_2 = map_widget.set_marker(lat5_2, lon5_2, icon=location_image)
 
-map_widget.add_right_click_menu_command(label="Add Marker",
-                                        command=add_marker_event,
-                                        pass_coords=True)
 
 def left_click_event(coordinates_tuple):
     map_widget.delete_all_marker()
@@ -248,12 +245,24 @@ def lightsAll():
         connection.mav.sys_status_send(17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 def getShowOrientation():
-    content = showOrientation.get("1.0", "end-1c")
-    float_content = float(content)
-    showOrientationVal = float_content
+    contentShowOrientation = showOrientation.get("1.0", "end-1c")
+    float_contentShowOrientation = float(contentShowOrientation)
+    showOrientationVal = float_contentShowOrientation
     print(showOrientationVal)
+
+    contentShowOrigin = showOrigin.get("1.0", "end-1c")
+    float_contentShowOrientation = float(contentShowOrientation)
+    showOrientationVal = float_contentShowOrientation
+    print(showOrientationVal)
+
+    lat1_1_str, lon1_1_str = contentShowOrigin.split()
+    lat1_1 = float(lat1_1_str)
+    lon1_1 = float(lon1_1_str)
+    print("Latitude:", lat1_1)
+    print("Longitude:", lon1_1)
+
     map_widget.delete_all_marker()
-    add_marker_event([7.2597763, 80.5990883], showOrientationVal)
+    add_marker_event([lat1_1, lon1_1], showOrientationVal)
 
 
 showOrigin = Text(master, height=1, width=22)

@@ -2,8 +2,8 @@ import serial
 from pymavlink import mavutil
 from itertools import cycle
 
-serial_port = serial.Serial('COM9', 921600)
-the_connection_1 = mavutil.mavlink_connection('udpout:192.168.0.13:14555')
+serial_port = serial.Serial('COM8', 921600)
+the_connection_1 = mavutil.mavlink_connection('udpout:192.168.0.11:14555')
 
 g_seq_no = cycle(range(32))
 MAX_FRAGMENT_SIZE = 180
@@ -35,6 +35,9 @@ def encode(packet: bytes):
         # not fragmented packet
         the_connection_1.mav.gps_rtcm_data_send(0, len(packet), packet.ljust(180, b"\x00"))
 
+
+
 while True:
     data = serial_port.readline()
+    print(data)
     encode(data)

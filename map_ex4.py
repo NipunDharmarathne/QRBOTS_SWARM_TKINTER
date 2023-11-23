@@ -48,8 +48,6 @@ marker_1 = map_widget.set_marker(7.25974, 80.59904, text="52.55, 13.4", icon=loc
 
 
 
-
-
 def add_marker_event(coords):
     print("Add marker:", coords)
     
