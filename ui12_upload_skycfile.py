@@ -75,6 +75,7 @@ def upload_file():
         # Extract home positions of drones
         global drone_home_positions
         drone_home_positions.clear()
+        map_widget.delete_all_marker()
 
         for drone in data['swarm']['drones']:
             home_position = drone['settings']['home']
@@ -119,7 +120,7 @@ map_widget.set_position(7.25963, 80.59915)
 map_widget.set_zoom(19)
 
 current_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-location_image = ImageTk.PhotoImage(Image.open(os.path.join(current_path, "images", "location.png")).resize((5, 8)))
+location_image = ImageTk.PhotoImage(Image.open(os.path.join(current_path, "images", "location.png")).resize((4, 7)))
 
 
 def add_marker_event(coords, showOrientationVal):
@@ -428,7 +429,7 @@ def listen_func():
         if msg is not None:    
             for i in range(len(esp32_ip_list)):
                 if msg.get_srcSystem() == i + 1:
-                    print(f"sysid: {msg.get_srcSystem()}, compid: {msg.get_srcComponent()}, message id: {msg.get_msgId()}")
+                    # print(f"sysid: {msg.get_srcSystem()}, compid: {msg.get_srcComponent()}, message id: {msg.get_msgId()}")
                     yawVals[i].config(text=f"{msg.yaw * 180 / math.pi:.2f}")
 
 
