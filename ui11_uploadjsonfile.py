@@ -8,6 +8,18 @@ import os
 from tkintermapview import TkinterMapView
 from PIL import Image, ImageTk
 from math import asin, atan2, cos, degrees, radians, sin
+from tkinter import filedialog
+import json
+
+def calculate_distance_and_bearing(point1, point2):
+    x1, y1 = point1
+    x2, y2 = point2
+
+    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+    angle = math.atan2(x2 - x1, y2 - y1)
+    angle_degrees = math.degrees(angle)
+    return distance, angle_degrees
 
 # func to get coordinates of the point #############################################################################
 def get_point_at_distance(lat1, lon1, d, bearing, R=6371):
@@ -29,6 +41,53 @@ def get_point_at_distance(lat1, lon1, d, bearing, R=6371):
         cos(d/R) - sin(lat1) * sin(lat2)
     )
     return (degrees(lat2), degrees(lon2),)
+
+drone_home_positions = []
+
+def upload_file():
+    contentShowOrientation = showOrientation.get("1.0", "end-1c")
+    float_contentShowOrientation = float(contentShowOrientation)
+    showOrientationVal = float_contentShowOrientation
+    print(showOrientationVal)
+
+    contentShowOrigin = showOrigin.get("1.0", "end-1c")
+    print(showOrientationVal)
+
+    lat1_1_str, lon1_1_str = contentShowOrigin.split()
+    lat1_1 = float(lat1_1_str)
+    lon1_1 = float(lon1_1_str)
+
+    file_path = filedialog.askopenfilename()
+
+    if file_path:
+        label.config(text=file_path)
+
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+        
+        # Extract home positions of drones
+        global drone_home_positions
+        drone_home_positions.clear()
+
+        for drone in data['swarm']['drones']:
+            home_position = drone['settings']['home']
+            drone_home_positions.append(home_position)
+
+        # Now, 'drone_home_positions' contains a list of home positions
+        print("Home Positions of Drones:")
+        for i, position in enumerate(drone_home_positions, 1):
+            print(f"Drone {i}: {position}")
+            distance, bearing = calculate_distance_and_bearing(drone_home_positions[0][:2], position[:2])
+            print(distance, bearing)
+            lat, lon = get_point_at_distance(lat1_1, lon1_1, distance/1000, bearing)
+            map_widget.set_marker(lat, lon, icon=location_image)
+
+    else:
+        map_widget.delete_all_marker()
+        label.config(text="No file selected")
+
+
+
 
 # window #############################################################################
 master = Tk()
@@ -58,37 +117,17 @@ location_image = ImageTk.PhotoImage(Image.open(os.path.join(current_path, "image
 
 def add_marker_event(coords, showOrientationVal):
     print("Add marker:", coords)
-    
-    distance = 0.005
-    bearing = 90 + showOrientationVal
+    print(drone_home_positions)
         
     lat1_1 = coords[0]
     lon1_1 = coords[1]
-    lat2_1, lon2_1 = get_point_at_distance(lat1_1, lon1_1, distance, bearing)
-    lat3_1, lon3_1 = get_point_at_distance(lat2_1, lon2_1, distance, bearing)
-    lat4_1, lon4_1 = get_point_at_distance(lat3_1, lon3_1, distance, bearing)
-    lat5_1, lon5_1 = get_point_at_distance(lat4_1, lon4_1, distance, bearing)
 
-    new_marker1_1 = map_widget.set_marker(lat1_1, lon1_1, icon=location_image)
-    new_marker2_1 = map_widget.set_marker(lat2_1, lon2_1, icon=location_image)
-    new_marker3_1 = map_widget.set_marker(lat3_1, lon3_1,icon=location_image)
-    new_marker4_1 = map_widget.set_marker(lat4_1, lon4_1,icon=location_image)
-    new_marker5_1 = map_widget.set_marker(lat5_1, lon5_1,icon=location_image)
-
-    lat1_2, lon1_2 = get_point_at_distance(lat1_1, lon1_1, distance, showOrientationVal)
-    lat2_2, lon2_2 = get_point_at_distance(lat1_2, lon1_2, distance, bearing)
-    lat3_2, lon3_2 = get_point_at_distance(lat2_2, lon2_2, distance, bearing)
-    lat4_2, lon4_2 = get_point_at_distance(lat3_2, lon3_2, distance, bearing)
-    lat5_2, lon5_2 = get_point_at_distance(lat4_2, lon4_2, distance, bearing)
-
-    new_marker1_2 = map_widget.set_marker(lat1_2, lon1_2, icon=location_image)
-    new_marker2_2 = map_widget.set_marker(lat2_2, lon2_2, icon=location_image)
-    new_marker3_2 = map_widget.set_marker(lat3_2, lon3_2, icon=location_image)
-    new_marker4_2 = map_widget.set_marker(lat4_2, lon4_2, icon=location_image)
-    new_marker5_2 = map_widget.set_marker(lat5_2, lon5_2, icon=location_image)
-
-
-
+    for i, position in enumerate(drone_home_positions, 1):
+        print(f"Drone {i}: {position}")
+        distance, bearing = calculate_distance_and_bearing(drone_home_positions[0][:2], position[:2])
+        print(distance, bearing)
+        lat, lon = get_point_at_distance(lat1_1, lon1_1, distance/1000, bearing+showOrientationVal)
+        map_widget.set_marker(lat, lon, icon=location_image)
 
 
 
@@ -243,10 +282,6 @@ def getShowOrientation():
     print(showOrientationVal)
 
     contentShowOrigin = showOrigin.get("1.0", "end-1c")
-    float_contentShowOrientation = float(contentShowOrientation)
-    showOrientationVal = float_contentShowOrientation
-    print(showOrientationVal)
-
     lat1_1_str, lon1_1_str = contentShowOrigin.split()
     lat1_1 = float(lat1_1_str)
     lon1_1 = float(lon1_1_str)
@@ -256,30 +291,35 @@ def getShowOrientation():
     map_widget.delete_all_marker()
     add_marker_event([lat1_1, lon1_1], showOrientationVal)
 
+label = Label(master, text="No file selected", fg="white", bg="grey6")
+label.grid(row = 5, column = 0, columnspan=2, sticky = N)
+
+upload_button = Button(master, text="Upload File", bg="cyan4", command=upload_file)
+upload_button.grid(row = 6, column = 0, columnspan=2, sticky = N)
 
 showOriginLabel = Label(master, text = "   Show Origin:", fg="white", bg="grey6")
-showOriginLabel.grid(row = 5, column = 0, sticky = W)
+showOriginLabel.grid(row = 7, column = 0, sticky = W)
 
 showOrigin = Text(master, height=1, width=22)
 showOrigin.insert("1.0", "7.2597843 80.5991768")
-showOrigin.grid(row = 5, column = 1)
+showOrigin.grid(row = 7, column = 1)
 
 showOrientationLabel = Label(master, text = "   Show Orientation:", fg="white", bg="grey6")
-showOrientationLabel.grid(row = 6, column = 0, sticky = W)
+showOrientationLabel.grid(row = 8, column = 0, sticky = W)
 
 showOrientation = Text(master, height=1, width=22)
 showOrientation.insert("1.0", "0.0")
-showOrientation.grid(row = 6, column = 1, sticky = N)
+showOrientation.grid(row = 8, column = 1, sticky = N)
 
 updateShowOriginOrientation = Button(master, text = "UPDATE", bg="cyan4", command=getShowOrientation)
-updateShowOriginOrientation.grid(row = 7, column = 0, columnspan=2, sticky = N)
+updateShowOriginOrientation.grid(row = 9, column = 0, columnspan=2, sticky = N)
 
 
 b1 = Button(master, text = "ARM ALL", height=3, width=25, bg="springgreen3", command=armAll)
-b1.grid(row = 8, column = 0, sticky = W)
+b1.grid(row = 10, column = 0, sticky = W)
 
 b2 = Button(master, text = "DISARM ALL", height=3, width=25, bg="cyan4", command=disarmAll)
-b2.grid(row = 8, column = 1, sticky = W)
+b2.grid(row = 10, column = 1, sticky = W)
 
 b3 = Button(master, text = "TAKE OFF ALL", height=3, width=25, bg="chartreuse2", command=takeOffAll)
 b4 = Button(master, text = "LAND ALL", height=3, width=25, bg="chocolate1", command=landAll)
@@ -288,11 +328,11 @@ b6 = Button(master, text = "SHOW ALL", height=3, width=25, bg="tomato", command=
 b7 = Button(master, text = "LIGHT ALL", height=3, width=25, bg="olivedrab1", command=lightsAll)
 
 # arranging button widgets
-b3.grid(row = 9, column = 0, sticky = W)
-b4.grid(row = 9, column = 1, sticky = W)
-b5.grid(row = 10, column = 0, sticky = W)
-b6.grid(row = 10, column = 1, sticky = W)
-b7.grid(row = 11, column = 0, sticky = W)
+b3.grid(row = 11, column = 0, sticky = W)
+b4.grid(row = 11, column = 1, sticky = W)
+b5.grid(row = 12, column = 0, sticky = W)
+b6.grid(row = 12, column = 1, sticky = W)
+b7.grid(row = 13, column = 0, sticky = W)
 
 
 
