@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter.ttk import Combobox
 from pymavlink import mavutil
 import socket
 import time
@@ -11,6 +12,13 @@ from math import asin, atan2, cos, degrees, radians, sin
 from tkinter import filedialog
 import zipfile
 import json
+import serial.tools.list_ports
+from itertools import cycle
+
+def get_available_ports():
+    ports = serial.tools.list_ports.comports()
+    ports_description = [port.device + ": " + port.description for port in ports]
+    return ports_description
 
 def calculate_distance_and_bearing(point1, point2):
     x1, y1 = point1
@@ -312,38 +320,105 @@ def getShowOrientation():
     lon1_1 = float(lon1_1_str)
     print("Latitude:", lat1_1)
     print("Longitude:", lon1_1)
-
     add_marker_event([lat1_1, lon1_1], showOrientationVal)
 
+selected_port = ""  
+selected_baudrate = 921600
+
+the_connection_rtk = mavutil.mavlink_connection('udpout:192.168.0.255:14555')
+g_seq_no = cycle(range(32))
+MAX_FRAGMENT_SIZE = 180
+
+def encode(packet: bytes):
+    if len(packet) > MAX_FRAGMENT_SIZE:
+        # fragmented packet
+        slices = [
+            packet[i : (i + MAX_FRAGMENT_SIZE)]
+            for i in range(0, len(packet), MAX_FRAGMENT_SIZE)
+        ]
+
+        if len(slices[-1]) == MAX_FRAGMENT_SIZE:
+            # if the last fragment is full, we need to add an extra empty
+            # one according to the protocol
+            slices.append(b"")
+
+        if len(slices) > 4:
+            return
+
+        seq_no = next(g_seq_no)
+
+        for fragment_id, packet in enumerate(slices):
+            flags = (seq_no << 3) + (fragment_id << 1) + 1
+            the_connection_rtk.mav.gps_rtcm_data_send(flags, len(packet), packet.ljust(180, b"\x00"))
+
+    else:
+        # not fragmented packet
+        the_connection_rtk.mav.gps_rtcm_data_send(0, len(packet), packet.ljust(180, b"\x00"))
+
+
+
+def sendRTKmessages():
+    start_rtk_thread()
+
+
+def on_select_portsdropdown(event):
+    global selected_port
+    selected_port = portsdropdown_var.get()
+    print(f"Selected item: {selected_port}")
+
+def on_select_baudratedropdown(event):
+    global selected_baudrate
+    selected_baudrate = baudratedropdown_var.get()
+    print(f"Selected item: {selected_baudrate}")
+
+portsdropdown_var = StringVar()
+portsoptions = get_available_ports()
+portsdropdown = Combobox(master, textvariable=portsdropdown_var, values=portsoptions, state="readonly")
+portsdropdown.set("Select Port")  # Set the default value
+portsdropdown.bind("<<ComboboxSelected>>", on_select_portsdropdown)  # Bind the event handler
+portsdropdown.grid(row = 5, column = 0, sticky = EW)
+
+baudratedropdown_var = StringVar()
+baudrateoptions = ["921600", "57600", "9600"]
+baudratedropdown = Combobox(master, textvariable=baudratedropdown_var, values=baudrateoptions, state="readonly")
+baudratedropdown.set("921600")  # Set the default value
+baudratedropdown.bind("<<ComboboxSelected>>", on_select_baudratedropdown)  # Bind the event handler
+baudratedropdown.grid(row = 5, column = 1, sticky = EW)
+
+sendRTKmessagesBtn = Button(master, text = "SEND RTK MESSAGES", bg="cyan4", command=sendRTKmessages)
+sendRTKmessagesBtn.grid(row = 6, column = 0, columnspan=2, sticky=N)
+
+
+
 label = Label(master, text="No file selected", fg="white", bg="grey6")
-label.grid(row = 5, column = 0, columnspan=2, sticky = N)
+label.grid(row = 7, column = 0, columnspan=2, sticky = N)
 
 upload_button = Button(master, text="Upload File", bg="cyan4", command=upload_file)
-upload_button.grid(row = 6, column = 0, columnspan=2, sticky = N)
+upload_button.grid(row = 8, column = 0, columnspan=2, sticky = N)
 
 showOriginLabel = Label(master, text = "   Show Origin:", fg="white", bg="grey6")
-showOriginLabel.grid(row = 7, column = 0, sticky = W)
+showOriginLabel.grid(row = 9, column = 0, sticky = W)
 
 showOrigin = Text(master, height=1, width=22)
 showOrigin.insert("1.0", "7.2597843 80.5991768")
-showOrigin.grid(row = 7, column = 1)
+showOrigin.grid(row = 9, column = 1)
 
 showOrientationLabel = Label(master, text = "   Show Orientation:", fg="white", bg="grey6")
-showOrientationLabel.grid(row = 8, column = 0, sticky = W)
+showOrientationLabel.grid(row = 10, column = 0, sticky = W)
 
 showOrientation = Text(master, height=1, width=22)
 showOrientation.insert("1.0", "0.0")
-showOrientation.grid(row = 8, column = 1, sticky = N)
+showOrientation.grid(row = 10, column = 1, sticky = N)
 
 updateShowOriginOrientation = Button(master, text = "UPDATE", bg="cyan4", command=getShowOrientation)
-updateShowOriginOrientation.grid(row = 9, column = 0, columnspan=2, sticky = N)
+updateShowOriginOrientation.grid(row = 11, column = 0, columnspan=2, sticky = N)
 
 
 b1 = Button(master, text = "ARM ALL", height=3, width=25, bg="springgreen3", command=armAll)
-b1.grid(row = 10, column = 0, sticky = W)
+b1.grid(row = 12, column = 0, sticky = NSEW)
 
 b2 = Button(master, text = "DISARM ALL", height=3, width=25, bg="cyan4", command=disarmAll)
-b2.grid(row = 10, column = 1, sticky = W)
+b2.grid(row = 12, column = 1, sticky = NSEW)
 
 b3 = Button(master, text = "TAKE OFF ALL", height=3, width=25, bg="chartreuse2", command=takeOffAll)
 b4 = Button(master, text = "LAND ALL", height=3, width=25, bg="chocolate1", command=landAll)
@@ -352,11 +427,11 @@ b6 = Button(master, text = "SHOW ALL", height=3, width=25, bg="tomato", command=
 b7 = Button(master, text = "LIGHT ALL", height=3, width=25, bg="olivedrab1", command=lightsAll)
 
 # arranging button widgets
-b3.grid(row = 11, column = 0, sticky = W)
-b4.grid(row = 11, column = 1, sticky = W)
-b5.grid(row = 12, column = 0, sticky = W)
-b6.grid(row = 12, column = 1, sticky = W)
-b7.grid(row = 13, column = 0, sticky = W)
+b3.grid(row = 13, column = 0, sticky = NSEW)
+b4.grid(row = 13, column = 1, sticky = NSEW)
+b5.grid(row = 14, column = 0, sticky = NSEW)
+b6.grid(row = 14, column = 1, sticky = NSEW)
+b7.grid(row = 15, column = 0, sticky = NSEW)
 
 
 
@@ -474,10 +549,22 @@ def listen_func():
             # elif msg.get_srcSystem() == 2:
             #     marker_2.set_position(msgGPS.lat/10000000.0, msgGPS.lon/10000000.0)
 
+def listen_rtk():
+    print(selected_port.split(':', 1)[0].strip(), selected_baudrate)
+    serial_port = serial.Serial(selected_port.split(':', 1)[0].strip(), selected_baudrate)
+    
+    while True:
+        data = serial_port.readline()
+        print(data)
+        encode(data)
 
 receive_thread = threading.Thread(target=listen_func)
 def start_receive_thread():
     receive_thread.start()
+
+rtk_thread = threading.Thread(target=listen_rtk)
+def start_rtk_thread():
+    rtk_thread.start()
 
 '''////////////////////////////////////////'''
 
