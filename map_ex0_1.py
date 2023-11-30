@@ -11,8 +11,8 @@ map_widget = tkintermapview.TkinterMapView(root_tk, width=1000, height=700, corn
 map_widget.pack(fill="both", expand=True)
 
 # set other tile server (standard is OpenStreetMap)
-map_widget.set_tile_server("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png", max_zoom=22)  # OpenStreetMap (default)
-# map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google normal
+# map_widget.set_tile_server("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png", max_zoom=22)  # OpenStreetMap (default)
+map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google normal
 # map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google satellite
 
 map_widget.set_position(7.25963, 80.59915)

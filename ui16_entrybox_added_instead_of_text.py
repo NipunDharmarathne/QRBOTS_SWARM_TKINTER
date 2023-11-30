@@ -122,11 +122,13 @@ right_frame.grid(row=0, rowspan=25, column=2, padx=3, pady=3, sticky="nw")
 
 # path for the database to use
 script_directory = os.path.dirname(os.path.abspath(__file__))
-database_path = os.path.join(script_directory, "offline_tiles_nyc.db")
+# database_path = os.path.join(script_directory, "offline_tiles_openstreet.db")
+database_path = os.path.join(script_directory, "offline_tiles_google_qbits.db")
 
 # create map widget and only use the tiles from the database, not the online server (use_database_only=True)
 map_widget = TkinterMapView(right_frame, width=1000, height=700, corner_radius=0, use_database_only=False,
                             max_zoom=19, database_path=database_path)
+map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22) 
 map_widget.pack(fill="both", expand=True)
 map_widget.set_position(7.25963, 80.59915)
 map_widget.set_zoom(19)
@@ -360,7 +362,6 @@ def encode(packet: bytes):
 def sendRTKmessages():
     start_rtk_thread()
 
-
 def on_select_portsdropdown(event):
     global selected_port
     selected_port = portsdropdown_var.get()
@@ -387,8 +388,6 @@ baudratedropdown.grid(row = 5, column = 1, sticky = EW)
 
 sendRTKmessagesBtn = Button(master, text = "SEND RTK MESSAGES", bg="cyan4", command=sendRTKmessages)
 sendRTKmessagesBtn.grid(row = 6, column = 0, columnspan=2, sticky=N)
-
-
 
 label = Label(master, text="No file selected", fg="white", bg="grey6")
 label.grid(row = 7, column = 0, columnspan=2, sticky = N)
