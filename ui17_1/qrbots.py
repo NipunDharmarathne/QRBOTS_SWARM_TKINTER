@@ -101,9 +101,9 @@ start = Button(master, text = "START", bg="springgreen3", command=start)
 start.grid(row = 4, column=0, columnspan=2)
 
 '''/// BACKEND ////////////////////////////////////////////////////////////////////////////////////////////////////'''
-esp32_ip_list = []
-udpout_connection_list = []
-markers_drones = []
+esp32_ip_list = []              # list to keep track of esp32 ips sending data to gui
+udpout_connection_list = []     # mavlink udpout connections set according to esp32_ip_list
+markers_drones = []             # markers in the map to show real time location of drones
 
 def create_udp_socket():
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -282,7 +282,7 @@ def create_labels_and_buttons(frame):
         errMsg = Label(frame, text="Unable to establish a connection.")
         errMsg.grid(row=0, column=0, padx=1, pady=1, sticky="w")
 
-    frame_inner.update_idletasks()
+    frame.update_idletasks()
     canvas.config(scrollregion=canvas.bbox("all"))
 
 ''''///////////////////////////'''
