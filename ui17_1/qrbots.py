@@ -339,7 +339,7 @@ def listen_func():
         msgGPS = the_connection.recv_match(type='GPS_RAW_INT', blocking=True)
         if msgGPS is not None:
             for i in range(len(esp32_ip_list)):
-                if msg.get_srcSystem() == i + 1:
+                if msgGPS.get_srcSystem() == i + 1:
                     markers_drones[i].set_position(msgGPS.lat/10000000.0, msgGPS.lon/10000000.0)
             # print(msgGPS)
             print(msgGPS.lat/10000000.0, msgGPS.lon/10000000.0)
