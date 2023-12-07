@@ -8,6 +8,6 @@ while 1:
     msg = the_connection.recv_match(blocking=True)
 
     if msg is not None:
-        print(msg)
+        print(msg.get_type())
         # print(msg.lat)
         # print(msg.lon)
